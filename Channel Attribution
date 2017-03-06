@@ -1,0 +1,28 @@
+#Install the packages
+install.packages("ChannelAttribution")
+install.packages("reshape")install.packages("ggplot2")
+install.packages("xlsx", dependencies = TRUE)
+install.packages("dplyr")
+
+#Load the libraries
+library(ChannelAttribution)
+library(reshape)
+library(ggplot2)
+
+#Import the file from the folder
+Channel_data_1<- read.csv("C:/Users/Desktop/Model output/Conversion Paths_1.csv")
+
+H1 <- heuristic_models(Channel_data_1, 'path', 'total_conversions')
+M1 <- markov_model(Channel_data_1, 'path', 'total_conversions', order = 1) 
+
+# Merges the two data frames
+R1 <- merge(H1, M1, by='channel_name') 
+
+# Selects only relevant columns
+R1 <- R[, (colnames(R)%in%c('channel_name', 'first_touch_conversions', 'last_touch_conversions', 'linear_touch_conversions', 'total_conversion'))]
+
+# Renames the columns
+colnames(R1) <- c('channel_name', 'first_touch', 'last_touch', 'linear_touch', 'markov_model') 
+
+# Transforms the dataset into a data frame that ggplot2 can use to graph the outcomes
+R1 <- melt(R1, id='channel_name')
